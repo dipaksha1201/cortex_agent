@@ -38,24 +38,27 @@ def create_reasoning_text(subquery_results, final_response) -> str:
             reasoning_steps.append("---------------SUB-QUERY RESPONSE---------------")
             reasoning_steps.append(response["response"])
     reasoning_steps.append("---------------FINAL ANSWER---------------")
-    reasoning_steps.append(final_response.final_answer)
+    reasoning_steps.append(final_response.content)
     return "\n".join(reasoning_steps)
 
+
 async def retrieve_subqueries(queries: list[str]):
-    url = os.getenv("DOCSERVICE_BASE_URL") + "/query"
+    url = f"{os.getenv('DOCSERVICE_BASE_URL')}/query"
     data = {
         "user_name": "dipak",
         "queries": queries
     }
-    
-    headers = {'Content-Type': 'application/json'}
-    
-    async with httpx.AsyncClient() as client:
+    headers = {
+        "Content-Type": "application/json",
+        "Connection": "keep-alive"
+    }
+
+    # Disable default timeouts
+    async with httpx.AsyncClient(timeout=None) as client:
         async with client.stream("POST", url, json=data, headers=headers) as response:
             if response.status_code == 200:
                 async for line in response.aiter_lines():
                     try:
-                        # Parse the JSON line into a dictionary
                         parsed_line = json.loads(line)
                         yield parsed_line
                     except json.JSONDecodeError:

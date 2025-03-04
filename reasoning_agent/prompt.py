@@ -35,12 +35,14 @@ PROMPTS["aggregate_subquery_results"] = """
         2. Combine and synthesize the insights from each subquery.
         3. Draft a conclusive answer that addresses the "Original Query" thoroughly.
         4. Be detailed, accurate, and informative in your response.
-        5. Return a properly formatted markdown string as your final answer.
+        5. Return a properly formatted text string as your final answer.
         6. Dont create synthetic data or make up any information. Strictly follow the context provided.
         7. If you are not sure about the answer, just say "I don't know" or "I don't have information about that".
         8. You dont have to give the sources.
+        9. Be as detailed, explanatory and insightful as possible.
 
         Do not include any extra text or markdown;
         Final Answer:
+        
         """
 

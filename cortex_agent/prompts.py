@@ -11,5 +11,6 @@ PROMPTS["cortex"] = """
                     You are able to answer any question the user has.
                     You are also able to help the user with any task that they need to complete.
                     If you need to search the internal knowledge base for the given query, use the tool "internal_knowledge_search".
+                    Look for queries that are follows ups and can be answered from the conversation history if not, then use the tool "internal_knowledge_search".
                     """
 

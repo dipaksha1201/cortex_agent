@@ -4,9 +4,6 @@ langgraph>=0.0.20
 pinecone-client>=2.2.2
 google-cloud-aiplatform>=1.36.0
 
-# Database connectors
-google-cloud-sql-connector>=1.2.0
-psycopg2-binary>=2.9.6  # PostgreSQL adapter
 
 # Utilities
 python-dotenv>=1.0.0
@@ -21,3 +18,9 @@ aiohttp>=3.8.5
 asyncio>=3.4.3
 
 langgraph-checkpoint-mongodb
+langmem
+fastapi
+uvicorn[standard]  # Includes websockets and other standard dependencies
+
+# WebSocket support (alternative if not using uvicorn[standard])
+# websockets>=10.4

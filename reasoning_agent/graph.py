@@ -1,7 +1,7 @@
 from langgraph.graph import END, StateGraph, START
 from reasoning_agent.prompt import PROMPTS
 from reasoning_agent.services import create_reasoning_text, format_relationships, retrieve_subqueries
-from utils import gemini_flash
+from utils import gemini_flash, gemini_flash_thinking
 from reasoning_agent.models import FinalAnswer, OverallState, Subqueries
 from langgraph.config import get_stream_writer
 
@@ -28,11 +28,8 @@ def aggregate_subquery_results(state: OverallState):
     relationships = [format_relationships(response["data"]["relationships"], response["query"]) for response in subquery_results if response["type"] == "response"]
     formatted_relationships = "\n".join(relationships)
     prompt = PROMPTS["aggregate_subquery_results"].format(original_query=state["query"], formatted_reasoning_steps=formatted_relationships)
-    final_response = gemini_flash.with_structured_output(FinalAnswer).invoke(prompt)
-    result = create_reasoning_text(subquery_results, final_response)
-    print("printing result")
-    print(result)
-    return {"final_answer": result}
+    final_response = gemini_flash_thinking.invoke(prompt)
+    return {"final_answer": final_response.content}
 
 # Construct the graph: here we put everything together to construct our graph
 graph = StateGraph(OverallState)

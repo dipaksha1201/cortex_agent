@@ -12,3 +12,5 @@ __pycache__/*
 *.pyz
 logs/*
 
+run.py
+utils/logger_config.py
