@@ -1,11 +1,11 @@
 from google import genai
 from google.genai.types import Tool, GenerateContentConfig, GoogleSearch, DynamicRetrievalConfig, DynamicRetrievalConfigMode
 from utils.logger_config import service_logger
-
+import os
 def google_search(query):
     # Initialize the client
     service_logger.info("google search query: ", query)
-    client = genai.Client(api_key="AIzaSyA56aGltaUfnrvc3p_dNfSZyoSNMQnPDhQ")
+    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
     
     # Set the model ID
     model_id = "gemini-2.0-flash"
