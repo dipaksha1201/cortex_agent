@@ -8,9 +8,15 @@ class Subqueries(BaseModel):
 
 class FinalAnswer(BaseModel):
     final_answer: str = Field(description="a string, a detailed answer to the user query")
-    
+
+class CheckTable(BaseModel):
+    check_table: bool = Field(description="a boolean, true if a table is required, false otherwise")
+
 class OverallState(TypedDict):
     query: str
     subqueries: list[str]
     subquery_results: list[dict]
     final_answer: str
+    enable_search: bool
+    show_table: bool
+    table: list[dict]

@@ -29,7 +29,7 @@ def format_relationships(relationships: list[dict], query: str) -> str:
         
     return "\n".join(relationships_str)
 
-def create_reasoning_text(subquery_results, final_response) -> str:
+def create_reasoning_text(subquery_results) -> str:
     reasoning_steps = []
     for response in subquery_results:
         if response["type"] == "response":
@@ -37,8 +37,7 @@ def create_reasoning_text(subquery_results, final_response) -> str:
             reasoning_steps.append(response["query"])
             reasoning_steps.append("---------------SUB-QUERY RESPONSE---------------")
             reasoning_steps.append(response["response"])
-    reasoning_steps.append("---------------FINAL ANSWER---------------")
-    reasoning_steps.append(final_response.content)
+
     return "\n".join(reasoning_steps)
 
 

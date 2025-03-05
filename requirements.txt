@@ -22,5 +22,7 @@ langmem
 fastapi
 uvicorn[standard]  # Includes websockets and other standard dependencies
 
+langchain-google-community
+
 # WebSocket support (alternative if not using uvicorn[standard])
 # websockets>=10.4

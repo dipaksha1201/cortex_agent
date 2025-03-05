@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, HTTPException, WebSocket
 from fastapi.encoders import jsonable_encoder
 from cortex_service.conversation import ConversationService
@@ -32,6 +33,7 @@ async def stream_chat_api(websocket: WebSocket):
             # Stream the response
             final_content = ""
             reasoning = []
+            table = None
             logger.info(f"Streaming conversation with id: {conversation_id}")
             async for partial_result in Chat.stream_chat_payload(data, user_id, conversation_id):
                 # Send each partial result as it becomes available
@@ -47,6 +49,8 @@ async def stream_chat_api(websocket: WebSocket):
                     reasoning[-1]["response"] = partial_result.get("content", "")
                 elif partial_result.get("type") == "complete":
                     final_content = partial_result.get("content", "")
+                    if partial_result.get("table"):
+                        table = json.loads(partial_result.get("table", ""))
             
             # Store the final message in the conversation
             if final_content:
@@ -54,7 +58,9 @@ async def stream_chat_api(websocket: WebSocket):
                     "content": final_content,
                     "sender": "cortex"
                 }
-                
+                if table:
+                    message_kwargs["table"] = table
+                    
                 if reasoning:
                     message_kwargs["reasoning"] = reasoning
                 
