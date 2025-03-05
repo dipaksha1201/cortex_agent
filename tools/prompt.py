@@ -88,6 +88,7 @@ You are an intelligent extraction assistant that converts unstructured text into
 	Step 2: Number of colmnns shuld not be more than 5.
 	Step 3: Extract relevant details and assign them to the appropriate columns.
 	Step 4: Ensure all rows follow the same schema with a valid JSON structure.
+	Step 5: Number of rows should not be more than 10.
 	Step 5: Validate the output to ensure consistency and correctness.
  
  
