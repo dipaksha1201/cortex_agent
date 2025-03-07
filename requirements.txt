@@ -23,6 +23,8 @@ fastapi
 uvicorn[standard]  # Includes websockets and other standard dependencies
 
 langchain-google-community
+langchain_google_genai
+google-genai
 
 # WebSocket support (alternative if not using uvicorn[standard])
 # websockets>=10.4

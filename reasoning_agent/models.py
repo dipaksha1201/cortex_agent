@@ -20,3 +20,4 @@ class OverallState(TypedDict):
     enable_search: bool
     show_table: bool
     table: list[dict]
+    user_id: str

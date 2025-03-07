@@ -4,7 +4,7 @@ import os
 from pydantic import Field
 from reasoning_agent import knowledge_engine
 from cortex_agent.prompts import PROMPTS
-from utils import gemini_flash, gemini_embeddings
+from utils import gemini_flash
 from langchain_core.tools import tool
 from typing_extensions import Annotated
 from langgraph.prebuilt import create_react_agent
@@ -13,6 +13,7 @@ from langgraph.checkpoint.mongodb import AsyncMongoDBSaver
 from utils.logger_config import cortex_logger
 from tools.google_search import google_search
 from langchain_core.messages import ToolMessage
+from langchain_core.runnables import RunnableConfig
 
 InternalKnowledgeSearch = Annotated[str, Field(description="Search the internal knowledge base for the given query.")]
 EnableSearch = Annotated[bool, Field(description="Enable the internet search tool and search the internet for the given query along with the internal knowledge search tool if the user has mentioned it in the query or else dont use the internet search tool.")]
@@ -20,12 +21,13 @@ GoogleSearchQuery = Annotated[str, Field(description="A relevant query to search
 ShowTable = Annotated[bool, Field(description="Show the table in the response if the user has mentioned it in the query or else dont show the table.")]
 
 @tool(return_direct=True)
-async def internal_knowledge_search(query: InternalKnowledgeSearch, enable_search: EnableSearch, show_table: ShowTable):
+async def internal_knowledge_search(query: InternalKnowledgeSearch, enable_search: EnableSearch, show_table: ShowTable, config: RunnableConfig):
     """Search the internal knowledge base for the query."""
-    print("enabling search: ", enable_search)
+    user_id = config["configurable"]["user_id"]
+    print("user id ", user_id)
 
     result = ""
-    async for s in knowledge_engine.astream({"query": query, "enable_search": enable_search, "show_table": show_table} , stream_mode="updates"):
+    async for s in knowledge_engine.astream({"query": query, "enable_search": enable_search, "show_table": show_table, "user_id": user_id} , stream_mode="updates"):
         if "final_answer" in s:
             result = s["final_answer"]
         if "table" in s:
@@ -63,11 +65,15 @@ async def run_cortex(inputs, config):
                     )
 
             async for s in cortex.astream(inputs, config, stream_mode="custom"):
-                if "retriever_updates" in s:
+                if "final-answer-streaming" in s:
+                    yield {"type": "final-answer-streaming", "content": s["final-answer-streaming"]}
+                elif "retriever_updates" in s:
                     if "response" in s["retriever_updates"]:
                         yield {"type": "response", "content": s["retriever_updates"]["response"]}
                     elif "query" in s["retriever_updates"]:
                         yield {"type": "query", "content": s["retriever_updates"]["query"]}
+                    elif "type" in s["retriever_updates"] and s["retriever_updates"]["type"] == "response-streaming":
+                        yield {"type": "response-streaming", "content": s["retriever_updates"]["chunk"]}
             
             state = await cortex.aget_state(config=config)
             cortex_logger.info(state.values)

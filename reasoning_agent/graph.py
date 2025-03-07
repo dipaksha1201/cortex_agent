@@ -1,15 +1,19 @@
 from langgraph.graph import END, StateGraph, START
 from tools.google_search import google_search
 from reasoning_agent.prompt import PROMPTS
-from reasoning_agent.services import create_reasoning_text, format_relationships, retrieve_subqueries
+from reasoning_agent.services import create_reasoning_text, format_relationships, retrieve_subqueries, format_documents 
 from tools.table_operator import table_operator
 from utils import gemini_flash, gemini_flash_thinking
 from reasoning_agent.models import CheckTable, OverallState, Subqueries
 from langgraph.config import get_stream_writer
 from utils.logger_config import cortex_logger
+from cortex_service.document import DocumentService
 
 def generate_subqueries(state: OverallState):
-    prompt = PROMPTS["generate_subqueries"].format(query=state["query"])
+    document_service = DocumentService()
+    documents = document_service.get_user_documents(state["user_id"])
+    database_info = format_documents(documents)
+    prompt = PROMPTS["generate_subqueries"].format(user_query=state["query"], database_info=database_info)
     response = gemini_flash.with_structured_output(Subqueries).invoke(prompt)
     return {"subqueries": response.subqueries}
 
@@ -19,7 +23,7 @@ async def node_retrieve_subqueries(state: OverallState):
     queries = state.get("subqueries", [])
     subquery_results = []
     writer = get_stream_writer()
-    async for output in retrieve_subqueries(queries):
+    async for output in retrieve_subqueries(queries, state["user_id"]):
         # Yield each piece of the response to stream downstream
         subquery_results.append(output)
         writer({"retriever_updates": output})
@@ -48,6 +52,13 @@ def aggregate_subquery_results(state: OverallState):
     else:
         prompt = PROMPTS["aggregate_subquery_results_with_search"].format(original_query=state["query"], formatted_reasoning_steps=reasoning_text)
 
+    writer = get_stream_writer()
+    final_response = ""
+    iterator = gemini_flash_thinking.stream(prompt)
+    for chunk in iterator:
+        final_response += chunk.content
+        writer({"final-answer-streaming": chunk.content})
+    
     table = "empty"
     if state.get("show_table", False):
         table = table_operator(reasoning_text)
@@ -56,10 +67,9 @@ def aggregate_subquery_results(state: OverallState):
         if check_table.check_table:
             table = table_operator(reasoning_text)
 
-    final_response = gemini_flash_thinking.invoke(prompt)
     cortex_logger.info(f"Final response from reasoning agent: {final_response}")
     cortex_logger.info(f"Table from reasoning agent: {table}")
-    return {"final_answer": final_response.content, "table": table}
+    return {"final_answer": final_response, "table": table}
 
 def is_internet_search_required(state: OverallState):
     enable_search = state.get("enable_search", False)

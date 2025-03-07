@@ -40,11 +40,21 @@ def create_reasoning_text(subquery_results) -> str:
 
     return "\n".join(reasoning_steps)
 
+def format_documents(documents):
+    formatted_string = ""
+    for index, document in enumerate(documents, start=1):
+        formatted_string += f"########Document {index}#########\n"
+        formatted_string += f"Name: {document.name}\n"
+        formatted_string += f"Type: {document.document_type}\n"
+        formatted_string += f"Domain: {document.domain}\n"
+        formatted_string += f"Description: {document.description}\n\n"
+        formatted_string += f"#########################################\n\n"
+    return formatted_string
 
-async def retrieve_subqueries(queries: list[str]):
+async def retrieve_subqueries(queries: list[str], user_id: str):
     url = f"{os.getenv('DOCSERVICE_BASE_URL')}/query"
     data = {
-        "user_name": "dipak",
+        "user_name": user_id,
         "queries": queries
     }
     headers = {
