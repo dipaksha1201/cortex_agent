@@ -2,9 +2,10 @@ from google import genai
 from google.genai.types import Tool, GenerateContentConfig, GoogleSearch, DynamicRetrievalConfig, DynamicRetrievalConfigMode
 from utils.logger_config import service_logger
 import os
+
 def google_search(query):
+    query = query + " ## Search Instructions## Provide references with URLs. Give the most relevant information first. Do a thorough search and provide all the information you can find."
     # Initialize the client
-    service_logger.info("google search query: ", query)
     client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
     
     # Set the model ID

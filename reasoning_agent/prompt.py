@@ -126,7 +126,7 @@ PROMPTS["aggregate_subquery_results_with_search"] = """You have been provided wi
      - *"I don't know"* or *"I don’t have information about that."*  
 
 5 **Formatting & Output**  
-   - **Clearly distinguish RAG-based insights from online search results** in the response.  
+   - **Clearly distinguish RAG-based insights as Internal Knowledge from online search results** in the response.  
    - Maintain a **coherent, easy-to-understand flow**.  
    - **DO NOT** include extra text, markdown, or unnecessary disclaimers.  
 

@@ -18,6 +18,7 @@ aiohttp>=3.8.5
 asyncio>=3.4.3
 
 langgraph-checkpoint-mongodb
+langgraph-swarm
 langmem
 fastapi
 uvicorn[standard]  # Includes websockets and other standard dependencies
