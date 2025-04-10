@@ -18,6 +18,7 @@ class OverallState(TypedDict):
     subquery_results: list[dict]
     final_answer: str
     enable_search: bool
-    show_table: bool
+    # show_table: bool
     table: list[dict]
+    project_id: str
     user_id: str

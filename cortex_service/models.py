@@ -16,6 +16,7 @@ class Message(BaseModel):
 class Conversation(BaseModel):
     id: Optional[ObjectId] = Field(default=None, alias="_id")
     user_id: str = Field(..., description="Identifier for the user")
+    project_id: str = Field(..., description="Identifier for the project")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Timestamp when the conversation was created")
     last_updated: datetime = Field(default_factory=datetime.utcnow,
                                    description="Timestamp when the conversation was last updated")
@@ -44,15 +45,18 @@ class DocumentFeatures(BaseModel):
  
 class Document(DocumentFeatures):
     id: ObjectId = Field(None, alias="_id")
+    type: Literal["uploaded", "web", "deepdive"] = Field(default="uploaded")
     user_id: str
+    project_id: str
     name: str
     status: Literal["extracted", "completed"] = Field(default="extracted")
     
     @classmethod
-    def from_features(cls, features: dict, user_id: str, name: str, status: Literal["extracted", "completed"], id: ObjectId = None) -> "Document":
+    def from_features(cls, features: dict, user_id: str, project_id: str, name: str, status: Literal["extracted", "completed"], id: ObjectId = None) -> "Document":
         return cls(
             **features,
             user_id=user_id,
+            project_id=project_id,
             name=name,
             status=status,
             id=id

@@ -33,13 +33,13 @@ class DocumentService:
             raise ValueError(f"Document with id {document_id} not found")
         return Document(**result)
 
-    def get_user_documents(self, user_id: str) -> List[Document]:
+    def get_user_documents(self, user_id: str, project_id: str) -> List[Document]:
         """Retrieve all documents for a specific user."""
         logger.info("Retrieving documents for user_id: %s", user_id)
         # Query the database for documents that match the given user_id.
-        documents = self.db["documents"].find({"user_id": user_id})
+        documents = self.db["documents"].find({"user_id": user_id, "project_id": project_id})
         documents = [Document(**doc) for doc in documents]
-        logger.info("Found %d documents for user '%s'", len(documents), user_id)
+        logger.info("Found %d documents for user '%s' and project '%s'", len(documents), user_id, project_id)
         return documents
 
     def get_document_by_id(self, document_id: str) -> Document:

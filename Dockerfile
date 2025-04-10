@@ -25,7 +25,7 @@ ENV FORWARDED_ALLOW_IPS="*"
 ENV TIMEOUT_KEEP_ALIVE=None
 
 # Expose the port the app runs on
-EXPOSE 9000
+EXPOSE 8080
 
 # Command to run the application with streaming support
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--loop", "asyncio", "--port", "9000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--loop", "asyncio", "--port", "8080"]

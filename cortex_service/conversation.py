@@ -17,6 +17,7 @@ class ConversationService:
         self,
         message: Message,
         user_id: str,
+        project_id: str,
         conversation_id: Optional[str] = None,
     ) -> Conversation:
         logger.debug("Processing message for user_id: %s; conversation_id: %s", user_id, conversation_id)
@@ -43,7 +44,7 @@ class ConversationService:
         else:
             logger.info("Creating new conversation for user '%s'", user_id)
             # Create a new conversation document if no conversation_id is provided.
-            conversation = Conversation(user_id=user_id, messages=[message])
+            conversation = Conversation(user_id=user_id, project_id=project_id, messages=[message])
             result = self.db["conversation"].insert_one(conversation.model_dump())
             conversation.id = result.inserted_id
         

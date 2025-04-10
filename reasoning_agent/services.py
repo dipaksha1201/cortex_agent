@@ -51,10 +51,15 @@ def format_documents(documents):
         formatted_string += f"#########################################\n\n"
     return formatted_string
 
-async def retrieve_subqueries(queries: list[str], user_id: str):
-    url = f"{os.getenv('DOCSERVICE_BASE_URL')}/query"
+async def retrieve_subqueries(queries: list[str], user_id: str, project_id: str):
+    # Force the local URL instead of using environment variable
+    doc_service_url = "http://127.0.0.1:8000/api"
+    print(f"DOCSERVICE_BASE_URL from env: {doc_service_url}")
+    url = f"{doc_service_url}/query"
+    print("url", url)
     data = {
         "user_name": user_id,
+        "project_id": project_id,
         "queries": queries
     }
     headers = {
